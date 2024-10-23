@@ -8,6 +8,8 @@ import argparse
 import sys
 import warnings
 from time import time
+import yaml
+import pathlib
 
 import pandas as pd
 from dimod import Binary, ConstrainedQuadraticModel, Integer
@@ -20,6 +22,9 @@ import utils.plot_schedule as job_plotter
 from model_data import JobShopData
 from utils.greedy import GreedyJobShop
 from utils.utils import print_cqm_stats, write_solution_to_file
+
+BASE_PATH = pathlib.Path(__file__).parent.resolve()
+DATA_PATH = BASE_PATH.parent.joinpath("input").resolve()
 
 
 def generate_greedy_makespan(job_data: JobShopData, num_samples: int = 100) -> int:
@@ -425,6 +430,14 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        "-c",
+        "--config",
+        type=str,
+        help="path to the config file; ",
+        default="config.yaml",
+    )
+
+    parser.add_argument(
         "-i",
         "--instance",
         type=str,
@@ -483,15 +496,29 @@ if __name__ == "__main__":
 
     # Parse input arguments.
     args = parser.parse_args()
-    input_file = args.instance
-    time_limit = args.time_limit
-    out_plot_file = args.output_plot
-    out_sol_file = args.output_solution
-    allow_quadratic_constraints = args.allow_quad
-    max_makespan = args.max_makespan
-    profile = args.profile
-    use_mip_solver = args.use_mip_solver
-    verbose = args.verbose
+    if args.config:
+        with open(args.config, "r", encoding="utf-8") as f:
+            CONFIG = yaml.safe_load(f)
+
+        input_file = CONFIG['input_file']
+        time_limit = CONFIG['time_limit']
+        out_plot_file = CONFIG['out_plot_file']
+        out_sol_file = CONFIG['out_sol_file']
+        allow_quadratic_constraints = CONFIG['allow_quadratic_constraints']
+        max_makespan = None if CONFIG['max_makespan'] == 'None' else CONFIG['max_makespan']
+        profile = None if CONFIG['profile'] == 'None' else CONFIG['profile']
+        use_mip_solver = CONFIG['use_mip_solver']
+        verbose = CONFIG['verbose']
+    else:
+        input_file = args.instance
+        time_limit = args.time_limit
+        out_plot_file = args.output_plot
+        out_sol_file = args.output_solution
+        allow_quadratic_constraints = args.allow_quad
+        max_makespan = args.max_makespan
+        profile = args.profile
+        use_mip_solver = args.use_mip_solver
+        verbose = args.verbose
 
     job_data = JobShopData()
     job_data.load_from_file(input_file)

@@ -1,0 +1,10 @@
+input_file: "../input/instance10_10.txt"
+time_limit: 10
+out_plot_file: "10_10_output.png"
+out_sol_file: "10_10_output.txt"
+allow_quadratic_constraints: True
+max_makespan: None
+profile: None
+use_mip_solver: False
+verbose: True
+

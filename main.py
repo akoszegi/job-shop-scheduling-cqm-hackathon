@@ -40,6 +40,7 @@ def main(input_size, time_limit):
     model_data = JobShopData()
     model_data.load_from_file(DATA_PATH.joinpath(filename), resource_names=RESOURCE_NAMES)
 
+
     # BUild model and solve
     results = run_shop_scheduler(
         model_data,
